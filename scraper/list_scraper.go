@@ -15,12 +15,13 @@ import (
 func ScrapeListByType(db *sql.DB, tipe string) {
 	c := colly.NewCollector(
 		colly.AllowedDomains("komiku.org", "www.komiku.org"),
+
 	)
 
 	c.Limit(&colly.LimitRule{
 		DomainGlob:  "*.komiku.*",
 		Parallelism: 1,
-		Delay:       1 * time.Second,
+		Delay:       2 * time.Second,
 	})
 
 	listURL := fmt.Sprintf("https://komiku.org/daftar-komik/?tipe=%s", url.QueryEscape(tipe))
@@ -28,6 +29,8 @@ func ScrapeListByType(db *sql.DB, tipe string) {
 
 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
 		href := e.Attr("href")
+
+		// Hanya ambil link yang berisi manga/manhwa/manhua
 		if strings.Contains(href, "/manga/") || strings.Contains(href, "/manhwa/") || strings.Contains(href, "/manhua/") {
 			title := strings.TrimSpace(e.Text)
 			if title == "" {
@@ -37,14 +40,23 @@ func ScrapeListByType(db *sql.DB, tipe string) {
 				return
 			}
 
-			slug := strings.Trim(href, "/")
+			// ✅ pastikan URL absolut
+			if strings.HasPrefix(href, "/") {
+				href = "https://komiku.org" + href
+			}
+
+			// bersihkan slug (tanpa domain)
+			slug := strings.Trim(strings.TrimPrefix(href, "https://komiku.org/"), "/")
+
 			comicID := models.EnsureComic(db, typeID, title, slug, href)
-			log.Println("📘 Comic:", title)
+			log.Printf("📘 Comic: %s (%s)\n", title, href)
+
+			// lanjut scrape detail + chapter
 			ScrapeComicChapters(db, href, comicID)
 		}
 	})
 
 	if err := c.Visit(listURL); err != nil {
-		log.Println("Error visiting list:", err)
+		log.Println("❌ Error visiting list:", err)
 	}
 }
