@@ -1,7 +1,20 @@
 package main
 
-import "fmt"
+import (
+	"log"
+
+	"komiku-scraper-go/config"
+	"komiku-scraper-go/scraper"
+)
 
 func main() {
-	fmt.Println("Hello, 世界")
+	db := config.ConnectDB()
+	defer db.Close()
+
+	types := []string{"manga", "manhwa", "manhua"}
+
+	for _, t := range types {
+		log.Println("=== Scraping:", t, "===")
+		scraper.ScrapeListByType(db, t)
+	}
 }
