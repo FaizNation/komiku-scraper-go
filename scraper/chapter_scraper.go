@@ -7,8 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gocolly/colly/v2"
 	"komiku-scraper-go/models"
+
+	"github.com/gocolly/colly/v2"
 )
 
 func ScrapeChapterImages(db *sql.DB, chapterURL string, chapterID int64) {
@@ -24,8 +25,15 @@ func ScrapeChapterImages(db *sql.DB, chapterURL string, chapterID int64) {
 		if img == "" {
 			img = e.Attr("src")
 		}
+		img = e.Request.AbsoluteURL(strings.TrimSpace(img))
 		if img == "" {
 			return
+		}
+		if strings.Contains(img, "flagcdn.com") ||
+			strings.Contains(img, "/asset/img/komikuplus2.jpg") {
+
+			log.Printf("   🚫 Skipping unwanted image: %s\n", img)
+			return // Lewati gambar ini
 		}
 
 		if strings.Contains(img, "gambar-id") || strings.HasSuffix(img, ".jpg") || strings.HasSuffix(img, ".png") {

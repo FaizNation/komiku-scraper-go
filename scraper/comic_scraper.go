@@ -62,6 +62,12 @@ func ScrapeComicDetailsAndChapters(db *sql.DB, comicURL string, comicID int64) {
 				return
 			}
 
+			// --- (BARU) Filter 2: Lewati chapter "Awal:" dan "Terbaru:" ---
+			if strings.Contains(title, "Awal:") || strings.Contains(title, "Terbaru:") {
+				log.Printf("Skip chapter (Awal/Terbaru): %s\n", title)
+				return // Lewati chapter ini untuk mencegah duplikasi
+			}
+
 			foundChapterCount++
 
 			slug := strings.Trim(href, "/")
