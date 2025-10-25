@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"komiku-scraper-go/models"
-
 	"github.com/gocolly/colly/v2"
 )
 
@@ -62,14 +61,13 @@ func ScrapeComicDetailsAndChapters(db *sql.DB, comicURL string, comicID int64) {
 				return
 			}
 
-			// --- (BARU) Filter 2: Lewati chapter "Awal:" dan "Terbaru:" ---
 			if strings.Contains(title, "Awal:") || strings.Contains(title, "Terbaru:") {
 				log.Printf("Skip chapter (Awal/Terbaru): %s\n", title)
-				return // Lewati chapter ini untuk mencegah duplikasi
+				return
 			}
 
 			foundChapterCount++
-
+			
 			slug := strings.Trim(href, "/")
 			chapterID := models.EnsureChapter(db, comicID, title, slug, href)
 			log.Println(" 	📖 Chapter:", title)

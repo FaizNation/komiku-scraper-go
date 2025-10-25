@@ -6,9 +6,8 @@ import (
 	"net/url"
 	"strings"
 	"time"
-
+	
 	"komiku-scraper-go/models"
-
 	"github.com/gocolly/colly/v2"
 )
 
@@ -16,6 +15,7 @@ func ScrapeChapterImages(db *sql.DB, chapterURL string, chapterID int64) {
 	c := colly.NewCollector(
 		colly.AllowedDomains("komiku.org", "www.komiku.org"),
 	)
+	c.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
 	c.Limit(&colly.LimitRule{DomainGlob: "*.komiku.*", Parallelism: 1, Delay: 500 * time.Millisecond})
 
 	pos := 0
