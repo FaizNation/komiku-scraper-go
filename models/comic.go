@@ -41,6 +41,6 @@ func UpdateComicDetails(db *sql.DB, comicID int64,
 	if err != nil {
 		log.Printf("❌ Error updating comic details for ID %d: %v\n", comicID, err)
 	} else {
-		log.Printf("✅ Updated details for comic ID %d\n", comicID)
+		log.Printf("✅ SUCCES!!! | Updated details for comic ID %d\n", comicID)
 	}
 }

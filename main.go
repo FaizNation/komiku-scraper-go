@@ -11,7 +11,7 @@ func main() {
 	db := config.ConnectDB()
 	defer db.Close()
 
-	types := []string{"manga", "manhwa", "manhua"}
+	types := []string{"manga, manhwa, manhua"}
 
 	for _, t := range types {
 		log.Println("=== Scraping:", t, "===")
